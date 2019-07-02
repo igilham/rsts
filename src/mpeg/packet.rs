@@ -49,6 +49,15 @@ pub fn pid(packet: &Packet) -> u16 {
     (((packet[1] & 0x1f) as u16) << 8) | packet[2] as u16
 }
 
+// Set the continuity counter. Max: 15
+pub fn set_continuity_counter(packet: &mut Packet, cc: u8) {
+    packet[3] = cc & 0x0f;
+}
+
+pub fn continuity_counter(packet: &Packet) -> u8 {
+    packet[3] & 0x0f
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -94,6 +103,15 @@ mod tests {
         for p in 0..8191 {
             set_pid(&mut packet, p);
             assert_eq!(pid(&packet), p);
+        }
+    }
+
+    #[test]
+    fn test_continuity_counter() {
+        let mut packet = null_packet();
+        for cc in 0..15 {
+            set_continuity_counter(&mut packet, cc);
+            assert_eq!(continuity_counter(&packet), cc);
         }
     }
 }
