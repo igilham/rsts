@@ -99,6 +99,34 @@ pub fn scrambling(packet: &Packet) -> u8 {
     (packet[3] & 0xc0) >> 6
 }
 
+pub fn set_discontinuity(packet: &mut Packet) {
+    packet[5] |= 0x80;
+}
+
+pub fn clear_discontinuity(packet: &mut Packet) {
+    packet[5] &= !0x80;
+}
+
+pub fn has_discontinuity(packet: &Packet) -> bool {
+    packet[5] & 0x80 != 0
+}
+
+pub fn set_random_access(packet: &mut Packet) {
+	packet[5] |= 0x40;
+}
+
+pub fn has_random_access(packet: &Packet) -> bool {
+	packet[5] & 0x40 != 0
+}
+
+pub fn set_stream_priority(packet: &mut Packet) {
+	packet[5] |= 0x20;
+}
+
+pub fn has_stream_priority(packet: &Packet) -> bool {
+	packet[5] & 0x20 != 0
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -216,5 +244,28 @@ mod tests {
         let mut packet = null_packet();
         set_scrambling(&mut packet, SCRAMBLING_ODD);
         assert_eq!(scrambling(&packet), SCRAMBLING_ODD);
+    }
+
+    #[test]
+    fn test_discontinuity() {
+        let mut packet = null_packet();
+        set_discontinuity(&mut packet);
+        assert!(has_discontinuity(&packet));
+        clear_discontinuity(&mut packet);
+        assert!(!has_discontinuity(&packet));
+    }
+
+    #[test]
+    fn test_random_access() {
+        let mut packet = null_packet();
+        set_random_access(&mut packet);
+        assert!(has_random_access(&packet));
+    }
+
+    #[test]
+    fn test_stream_priority() {
+        let mut packet = null_packet();
+        set_stream_priority(&mut packet);
+        assert!(has_stream_priority(&packet));
     }
 }
