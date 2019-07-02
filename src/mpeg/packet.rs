@@ -19,6 +19,10 @@ pub fn set_transport_error(packet: &mut Packet) {
     packet[1] |= 0x80;
 }
 
+pub fn transport_error(packet: &Packet) -> bool {
+    packet[1] & 0x80 != 0
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -35,9 +39,10 @@ mod tests {
     }
 
     #[test]
-    fn test_set_transport_error() {
+    fn test_transport_error() {
         let mut packet = null_packet();
         set_transport_error(&mut packet);
         assert_eq!(packet[1], 0x1f | 0x80);
+        assert!(transport_error(&packet));
     }
 }
