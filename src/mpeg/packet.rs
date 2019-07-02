@@ -16,7 +16,7 @@ pub fn null_packet() -> Packet {
 }
 
 pub fn set_transport_error(packet: &mut Packet) {
-    packet[1] = 0x80;
+    packet[1] |= 0x80;
 }
 
 #[cfg(test)]
@@ -34,10 +34,10 @@ mod tests {
         }
     }
 
-#[test]
+    #[test]
     fn test_set_transport_error() {
         let mut packet = null_packet();
         set_transport_error(&mut packet);
-        assert_eq!(packet[1], 0x80);
+        assert_eq!(packet[1], 0x1f | 0x80);
     }
 }
