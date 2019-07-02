@@ -19,7 +19,7 @@ pub fn set_transport_error(packet: &mut Packet) {
     packet[1] |= 0x80;
 }
 
-pub fn transport_error(packet: &Packet) -> bool {
+pub fn has_transport_error(packet: &Packet) -> bool {
     packet[1] & 0x80 != 0
 }
 
@@ -27,7 +27,7 @@ pub fn set_unit_start(packet: &mut Packet) {
     packet[1] |= 0x40;
 }
 
-pub fn unit_start(packet: &Packet) -> bool {
+pub fn has_unit_start(packet: &Packet) -> bool {
     packet[1] & 0x40 != 0
 }
 
@@ -35,8 +35,16 @@ pub fn set_transport_priority(packet: &mut Packet) {
     packet[1] |= 0x20;
 }
 
-pub fn transport_priority(packet: &Packet) -> bool {
+pub fn has_transport_priority(packet: &Packet) -> bool {
     packet[1] & 0x20 != 0
+}
+
+pub fn set_payload(packet: &mut Packet) {
+    packet[1] |= 0x10;
+}
+
+pub fn has_payload(packet: &Packet) -> bool {
+    packet[1] & 0x10 != 0
 }
 
 // Sets the PID. Max: 8191 (0x1fff)
@@ -78,7 +86,7 @@ mod tests {
         let mut packet = null_packet();
         set_transport_error(&mut packet);
         assert_eq!(packet[1], 0x1f | 0x80);
-        assert!(transport_error(&packet));
+        assert!(has_transport_error(&packet));
     }
 
     #[test]
@@ -86,7 +94,7 @@ mod tests {
         let mut packet = null_packet();
         set_unit_start(&mut packet);
         assert_eq!(packet[1], 0x1f | 0x40);
-        assert!(unit_start(&packet));
+        assert!(has_unit_start(&packet));
     }
 
     #[test]
@@ -94,7 +102,15 @@ mod tests {
         let mut packet = null_packet();
         set_transport_priority(&mut packet);
         assert_eq!(packet[1], 0x1f | 0x20);
-        assert!(transport_priority(&packet));
+        assert!(has_transport_priority(&packet));
+    }
+
+    #[test]
+    fn test_payload() {
+        let mut packet = null_packet();
+        set_payload(&mut packet);
+        assert_eq!(packet[1], 0x1f | 0x10);
+        assert!(has_payload(&packet));
     }
 
     #[test]
