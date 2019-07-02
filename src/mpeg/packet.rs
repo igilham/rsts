@@ -39,6 +39,16 @@ pub fn transport_priority(packet: &Packet) -> bool {
     packet[1] & 0x20 != 0
 }
 
+// Sets the PID. Max: 8191 (0x1fff)
+pub fn set_pid(packet: &mut Packet, pid: u16) {
+    packet[1] = (pid >> 8) as u8 & 0x1f;
+    packet[2] = (pid & 0x00ff) as u8;
+}
+
+pub fn pid(packet: &Packet) -> u16 {
+    (((packet[1] & 0x1f) as u16) << 8) | packet[2] as u16
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -76,5 +86,14 @@ mod tests {
         set_transport_priority(&mut packet);
         assert_eq!(packet[1], 0x1f | 0x20);
         assert!(transport_priority(&packet));
+    }
+
+    #[test]
+    fn test_pid() {
+        let mut packet = null_packet();
+        for p in 0..8191 {
+            set_pid(&mut packet, p);
+            assert_eq!(pid(&packet), p);
+        }
     }
 }
