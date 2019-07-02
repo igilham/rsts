@@ -82,6 +82,10 @@ pub fn has_adaptation_field(packet: &Packet) -> bool {
     packet[3] & 0x20 != 0
 }
 
+pub fn adaptation_field(packet: &Packet) -> u8 {
+    packet[4]
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -153,7 +157,7 @@ mod tests {
         let length: u8 = 0;
         set_adaptation_field(&mut packet, length);
         assert!(has_adaptation_field(&packet));
-        assert_eq!(packet[4], length);
+        assert_eq!(adaptation_field(&packet), length);
         assert_eq!(packet[5], 0xff);
     }
 
@@ -163,7 +167,7 @@ mod tests {
         let length: u8 = 1;
         set_adaptation_field(&mut packet, length);
         assert!(has_adaptation_field(&packet));
-        assert_eq!(packet[4], length);
+        assert_eq!(adaptation_field(&packet), length);
         assert_eq!(packet[5], 0x00);
     }
 
@@ -173,7 +177,7 @@ mod tests {
         let length: u8 = 2;
         set_adaptation_field(&mut packet, length);
         assert!(has_adaptation_field(&packet));
-        assert_eq!(packet[4], length);
+        assert_eq!(adaptation_field(&packet), length);
         assert_eq!(packet[5], 0x00);
         for i in 6..PACKET_SIZE {
             assert_eq!(packet[i], 0xff);
