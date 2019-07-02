@@ -23,6 +23,14 @@ pub fn transport_error(packet: &Packet) -> bool {
     packet[1] & 0x80 != 0
 }
 
+pub fn set_unit_start(packet: &mut Packet) {
+    packet[1] |= 0x40;
+}
+
+pub fn unit_start(packet: &Packet) -> bool {
+    packet[1] & 0x40 != 0
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -44,5 +52,13 @@ mod tests {
         set_transport_error(&mut packet);
         assert_eq!(packet[1], 0x1f | 0x80);
         assert!(transport_error(&packet));
+    }
+
+    #[test]
+    fn test_unit_start() {
+        let mut packet = null_packet();
+        set_unit_start(&mut packet);
+        assert_eq!(packet[1], 0x1f | 0x40);
+        assert!(unit_start(&packet));
     }
 }
