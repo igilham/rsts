@@ -10,8 +10,7 @@ pub type Packet = [u8; PACKET_SIZE];
 pub fn null_packet() -> Packet {
     let mut packet: Packet = [0xff; PACKET_SIZE];
     packet[0] = SYNC_BYTE;
-    packet[1] = 0x1f;
-    packet[2] = 0xff;
+    packet[1] = 0x1f; // first half of NULL_PACKET_PID
     return packet;
 }
 
@@ -40,14 +39,14 @@ pub fn has_transport_priority(packet: &Packet) -> bool {
 }
 
 pub fn set_payload(packet: &mut Packet) {
-    packet[1] |= 0x10;
+    packet[3] |= 0x10;
 }
 
 pub fn has_payload(packet: &Packet) -> bool {
-    packet[1] & 0x10 != 0
+    packet[3] & 0x10 != 0
 }
 
-// Sets the PID. Max: 8191 (0x1fff)
+/// Sets the PID. Max: 8191 (0x1fff)
 pub fn set_pid(packet: &mut Packet, pid: u16) {
     packet[1] = (pid >> 8) as u8 & 0x1f;
     packet[2] = (pid & 0x00ff) as u8;
@@ -57,13 +56,30 @@ pub fn pid(packet: &Packet) -> u16 {
     (((packet[1] & 0x1f) as u16) << 8) | packet[2] as u16
 }
 
-// Set the continuity counter. Max: 15
+/// Set the continuity counter. Max: 15
 pub fn set_continuity_counter(packet: &mut Packet, cc: u8) {
     packet[3] = cc & 0x0f;
 }
 
 pub fn continuity_counter(packet: &Packet) -> u8 {
     packet[3] & 0x0f
+}
+
+pub fn set_adaptation_field(packet: &mut Packet, length: u8) {
+    packet[3] |= 0x20;
+    packet[4] = length;
+    if length > 0 {
+        packet[5] = 0x00;
+    }
+    if length > 1 {
+        for i in 6..PACKET_SIZE {
+            packet[i] = 0xff; // stuffing
+        }
+    }
+}
+
+pub fn has_adaptation_field(packet: &Packet) -> bool {
+    packet[3] & 0x20 != 0
 }
 
 #[cfg(test)]
@@ -109,7 +125,7 @@ mod tests {
     fn test_payload() {
         let mut packet = null_packet();
         set_payload(&mut packet);
-        assert_eq!(packet[1], 0x1f | 0x10);
+        assert_eq!(packet[3], 0xff | 0x10);
         assert!(has_payload(&packet));
     }
 
@@ -128,6 +144,39 @@ mod tests {
         for cc in 0..15 {
             set_continuity_counter(&mut packet, cc);
             assert_eq!(continuity_counter(&packet), cc);
+        }
+    }
+
+    #[test]
+    fn test_adaptation_field_0() {
+        let mut packet = null_packet();
+        let length: u8 = 0;
+        set_adaptation_field(&mut packet, length);
+        assert!(has_adaptation_field(&packet));
+        assert_eq!(packet[4], length);
+        assert_eq!(packet[5], 0xff);
+    }
+
+    #[test]
+    fn test_adaptation_field_1() {
+        let mut packet = null_packet();
+        let length: u8 = 1;
+        set_adaptation_field(&mut packet, length);
+        assert!(has_adaptation_field(&packet));
+        assert_eq!(packet[4], length);
+        assert_eq!(packet[5], 0x00);
+    }
+
+    #[test]
+    fn test_adaptation_field_2() {
+        let mut packet = null_packet();
+        let length: u8 = 2;
+        set_adaptation_field(&mut packet, length);
+        assert!(has_adaptation_field(&packet));
+        assert_eq!(packet[4], length);
+        assert_eq!(packet[5], 0x00);
+        for i in 6..PACKET_SIZE {
+            assert_eq!(packet[i], 0xff);
         }
     }
 }
