@@ -5,6 +5,11 @@ pub const SYNC_BYTE: u8 = 0x47;
 pub const MAX_PID: u16 = 0x1FFF;
 pub const NULL_PACKET_PID: u16 = MAX_PID;
 
+// not technically defined in ISO-13818, but this seems to be the industry consensus
+pub const SCRAMBLING_CLEAR: u8 = 0;
+pub const SCRAMBLING_EVEN: u8 = 2;
+pub const SCRAMBLING_ODD: u8 = 3;
+
 pub type Packet = [u8; PACKET_SIZE];
 
 pub fn null_packet() -> Packet {
@@ -84,6 +89,14 @@ pub fn has_adaptation_field(packet: &Packet) -> bool {
 
 pub fn adaptation_field(packet: &Packet) -> u8 {
     packet[4]
+}
+
+pub fn set_scrambling(packet: &mut Packet, scrambling: u8) {
+    packet[3] = (scrambling | 0xc0) << 6;
+}
+
+pub fn scrambling(packet: &Packet) -> u8 {
+    (packet[3] & 0xc0) >> 6
 }
 
 #[cfg(test)]
@@ -182,5 +195,26 @@ mod tests {
         for i in 6..PACKET_SIZE {
             assert_eq!(packet[i], 0xff);
         }
+    }
+
+    #[test]
+    fn test_scrambling_clear() {
+        let mut packet = null_packet();
+        set_scrambling(&mut packet, SCRAMBLING_CLEAR);
+        assert_eq!(scrambling(&packet), SCRAMBLING_CLEAR);
+    }
+
+    #[test]
+    fn test_scrambling_even() {
+        let mut packet = null_packet();
+        set_scrambling(&mut packet, SCRAMBLING_EVEN);
+        assert_eq!(scrambling(&packet), SCRAMBLING_EVEN);
+    }
+
+    #[test]
+    fn test_scrambling_odd() {
+        let mut packet = null_packet();
+        set_scrambling(&mut packet, SCRAMBLING_ODD);
+        assert_eq!(scrambling(&packet), SCRAMBLING_ODD);
     }
 }
