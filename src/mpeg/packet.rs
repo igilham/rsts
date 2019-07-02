@@ -127,6 +127,23 @@ pub fn has_stream_priority(packet: &Packet) -> bool {
 	packet[5] & 0x20 != 0
 }
 
+pub fn set_pcr(packet: &mut Packet, pcr: u64) {
+    packet[5] |= 0x10;
+    packet[6] = (pcr >> 25) as u8 & 0xff;
+    packet[7] = (pcr >> 17) as u8 & 0xff;
+    packet[8] = (pcr >> 9) as u8 & 0xff;
+    packet[9] = (pcr >> 1) as u8 & 0xff;
+    packet[10] = 0x7e | ((pcr << 7) as u8 & 0x80);
+}
+
+pub fn has_pcr(packet: &Packet) -> bool {
+    packet[5] & 0x10 != 0
+}
+
+pub fn pcr(packet: &Packet) -> u64 {
+    (packet[6] as u64) << 25 | (packet[7] as u64) << 17 | (packet[8] as u64) << 9 | (packet[9] as u64) << 1 | (packet[10] as u64) >> 7
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -267,5 +284,14 @@ mod tests {
         let mut packet = null_packet();
         set_stream_priority(&mut packet);
         assert!(has_stream_priority(&packet));
+    }
+
+    #[test]
+    fn test_pcr() {
+        let mut packet = null_packet();
+        let p: u64 = 23647;
+        set_pcr(&mut packet, p);
+        assert!(has_pcr(&packet));
+        assert_eq!(pcr(&packet), p);
     }
 }
