@@ -144,6 +144,15 @@ pub fn pcr(packet: &Packet) -> u64 {
     (packet[6] as u64) << 25 | (packet[7] as u64) << 17 | (packet[8] as u64) << 9 | (packet[9] as u64) << 1 | (packet[10] as u64) >> 7
 }
 
+pub fn set_pcr_ext(packet: &mut Packet, ext: u16) {
+    packet[10] |= (ext >> 8) as u8 & 0x1;
+    packet[11] = ext as u8 & 0xff;
+}
+
+pub fn pcr_ext(packet: &Packet) -> u16 {
+    (((packet[10] as u16) << 8) & 1) | packet[11] as u16
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -293,5 +302,13 @@ mod tests {
         set_pcr(&mut packet, p);
         assert!(has_pcr(&packet));
         assert_eq!(pcr(&packet), p);
+    }
+
+    #[test]
+    fn test_pcr_ext() {
+        let mut packet = null_packet();
+        let ext: u16 = 137;
+        set_pcr_ext(&mut packet, ext);
+        assert_eq!(pcr_ext(&packet), ext);
     }
 }
