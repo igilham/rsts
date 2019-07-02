@@ -31,6 +31,14 @@ pub fn unit_start(packet: &Packet) -> bool {
     packet[1] & 0x40 != 0
 }
 
+pub fn set_transport_priority(packet: &mut Packet) {
+    packet[1] |= 0x20;
+}
+
+pub fn transport_priority(packet: &Packet) -> bool {
+    packet[1] & 0x20 != 0
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -60,5 +68,13 @@ mod tests {
         set_unit_start(&mut packet);
         assert_eq!(packet[1], 0x1f | 0x40);
         assert!(unit_start(&packet));
+    }
+
+    #[test]
+    fn test_transport_priority() {
+        let mut packet = null_packet();
+        set_transport_priority(&mut packet);
+        assert_eq!(packet[1], 0x1f | 0x20);
+        assert!(transport_priority(&packet));
     }
 }
