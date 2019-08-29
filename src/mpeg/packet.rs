@@ -15,7 +15,8 @@ pub type Packet = [u8; PACKET_SIZE];
 pub fn null_packet() -> Packet {
     let mut packet: Packet = [0xff; PACKET_SIZE];
     packet[0] = SYNC_BYTE;
-    packet[1] = 0x1f; // first half of NULL_PACKET_PID
+    packet[1] = 0x1f; // first half of NULL_PACKET_PID, second half already set to 0xff
+    packet[3] = 0x10; // adaptation control and continuity
     return packet;
 }
 
@@ -51,6 +52,10 @@ pub fn set_payload(packet: &mut Packet) {
 /// Does the packet have a payload indicator?
 pub fn has_payload(packet: &Packet) -> bool {
     packet[3] & 0x10 != 0
+}
+
+pub fn payload(packet: &Packet) -> &[u8] {
+    &packet[4..PACKET_SIZE]
 }
 
 /// Set the PID. Max: 8191 (0x1fff)
@@ -145,6 +150,8 @@ pub fn set_pcr(packet: &mut Packet, pcr: u64) {
     packet[10] = 0x7e | ((pcr << 7) as u8 & 0x80);
 }
 
+/// Does the packet have a programme clock reference field?
+/// Only valid if it has an adaptation field.
 pub fn has_pcr(packet: &Packet) -> bool {
     packet[5] & 0x10 != 0
 }
@@ -170,11 +177,17 @@ mod tests {
     fn test_null_packet() {
         let packet: Packet = null_packet();
         assert_eq!(packet[0], SYNC_BYTE);
-        assert_eq!(packet[1], 0x1f);
-        assert_eq!(packet[2], 0xff);
-        for i in 3..PACKET_SIZE {
-            assert_eq!(packet[i], 0xff);
+        assert_eq!(pid(&packet), NULL_PACKET_PID);
+        assert_eq!(packet[3], 0x10);
+        let payload = payload(&packet);
+        assert!(has_payload(&packet));
+        for i in 0..PAYLOAD_SIZE {
+            assert_eq!(payload[i], 0xff);
         }
+        assert!(has_discontinuity(&packet));
+        assert!(!has_adaptation_field(&packet));
+        assert!(!has_adaptation_field(&packet));
+        assert_eq!(continuity_counter(&packet), 0);
     }
 
     #[test]
@@ -205,7 +218,6 @@ mod tests {
     fn test_payload() {
         let mut packet = null_packet();
         set_payload(&mut packet);
-        assert_eq!(packet[3], 0xff | 0x10);
         assert!(has_payload(&packet));
     }
 
