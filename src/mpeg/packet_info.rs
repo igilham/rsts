@@ -1,6 +1,7 @@
 use super::packet;
 
 /// A higher-level representation of a transport stream packet.
+#[derive(Clone, Copy)]
 pub struct PacketInfo {
     packet: packet::Packet,
 }
@@ -142,5 +143,11 @@ impl From<packet::Packet> for PacketInfo {
 impl Into<packet::Packet> for PacketInfo {
     fn into(self) -> packet::Packet {
         self.packet
+    }
+}
+
+impl Default for PacketInfo {
+    fn default() -> Self {
+        PacketInfo::null_packet()
     }
 }
