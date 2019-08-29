@@ -130,3 +130,17 @@ impl PacketInfo {
         packet::pcr_ext(&self.packet)
     }
 }
+
+impl From<packet::Packet> for PacketInfo {
+    fn from(pkt: packet::Packet) -> Self {
+        PacketInfo {
+            packet: pkt,
+        }
+    }
+}
+
+impl Into<packet::Packet> for PacketInfo {
+    fn into(self) -> packet::Packet {
+        self.packet
+    }
+}
