@@ -47,6 +47,11 @@ impl PacketInfo {
         packet::has_payload(&self.packet)
     }
 
+    /// Get the payload as a slice of bytes
+    pub fn payload(&self) -> &[u8] {
+        packet::payload(&self.packet)
+    }
+
     /// Sets the PID. Max: 8191 (0x1fff)
     pub fn set_pid(&mut self, pid: u16) {
         packet::set_pid(&mut self.packet, pid);
@@ -169,6 +174,15 @@ mod tests {
     fn test_null_packet() {
         let p: PacketInfo = PacketInfo::null_packet();
         assert_eq!(p.pid(), packet::NULL_PACKET_PID);
+        assert_eq!(p.continuity_counter(), 0);
+        let payload = p.payload();
+        assert!(p.has_payload());
+        for i in 0..packet::PAYLOAD_SIZE {
+            assert_eq!(payload[i], 0xff);
+        }
+        assert!(p.has_discontinuity());
+        assert!(!p.has_adaptation_field());
+        assert!(!p.has_adaptation_field());
     }
 
     #[test]

@@ -54,6 +54,7 @@ pub fn has_payload(packet: &Packet) -> bool {
     packet[3] & 0x10 != 0
 }
 
+/// Get the payload as a slice of bytes
 pub fn payload(packet: &Packet) -> &[u8] {
     &packet[4..PACKET_SIZE]
 }
