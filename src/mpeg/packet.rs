@@ -178,7 +178,7 @@ mod tests {
         let packet: Packet = null_packet();
         assert_eq!(packet[0], SYNC_BYTE);
         assert_eq!(pid(&packet), NULL_PACKET_PID);
-        assert_eq!(packet[3], 0x10);
+        assert_eq!(continuity_counter(&packet), 0);
         let payload = payload(&packet);
         assert!(has_payload(&packet));
         for i in 0..PAYLOAD_SIZE {
@@ -187,14 +187,12 @@ mod tests {
         assert!(has_discontinuity(&packet));
         assert!(!has_adaptation_field(&packet));
         assert!(!has_adaptation_field(&packet));
-        assert_eq!(continuity_counter(&packet), 0);
     }
 
     #[test]
     fn test_transport_error() {
         let mut packet = null_packet();
         set_transport_error(&mut packet);
-        assert_eq!(packet[1], 0x1f | 0x80);
         assert!(has_transport_error(&packet));
     }
 
@@ -202,7 +200,6 @@ mod tests {
     fn test_unit_start() {
         let mut packet = null_packet();
         set_unit_start(&mut packet);
-        assert_eq!(packet[1], 0x1f | 0x40);
         assert!(has_unit_start(&packet));
     }
 
@@ -210,7 +207,6 @@ mod tests {
     fn test_transport_priority() {
         let mut packet = null_packet();
         set_transport_priority(&mut packet);
-        assert_eq!(packet[1], 0x1f | 0x20);
         assert!(has_transport_priority(&packet));
     }
 
