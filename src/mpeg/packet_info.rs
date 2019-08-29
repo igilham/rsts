@@ -7,32 +7,39 @@ pub struct PacketInfo {
 }
 
 impl PacketInfo {
+    /// Get a new null packet
     pub fn null_packet() -> Self {
         PacketInfo {
             packet: packet::null_packet(),
         }
     }
 
+    /// Set the transport error indicator
     pub fn set_transport_error(&mut self) {
         packet::set_transport_error(&mut self.packet);
     }
 
+    /// Is the transport error indicator set?
     pub fn has_transport_error(&self) -> bool {
         packet::has_transport_error(&self.packet)
     }
 
+    /// Set the unit start indicator
     pub fn set_unit_start(&mut self) {
         packet::set_unit_start(&mut self.packet);
     }
 
+    /// Is the unit start indicator set?
     pub fn has_unit_start(&self) -> bool {
         packet::has_unit_start(&self.packet)
     }
 
+    /// Set the transport priority indicator
     pub fn set_transport_priority(&mut self) {
         packet::set_transport_priority(&mut self.packet);
     }
 
+    /// Is the transport priority indicator set?
     pub fn has_transport_priority(&self) -> bool {
         packet::has_transport_priority(&self.packet)
     }
@@ -42,7 +49,7 @@ impl PacketInfo {
         packet::set_payload(&mut self.packet);
     }
 
-    /// Does the packet have a payload indicator?
+    /// Is the payload present indicator set?
     pub fn has_payload(&self) -> bool {
         packet::has_payload(&self.packet)
     }
@@ -77,70 +84,88 @@ impl PacketInfo {
         packet::continuity_counter(&self.packet)
     }
 
+    /// Set the adaptation field length (&indicator)
     pub fn set_adaptation_field(&mut self, length: u8) {
         packet::set_adaptation_field(&mut self.packet, length);
     }
 
+    /// Is the adaptation field indicator set?
     pub fn has_adaptation_field(&self) -> bool {
         packet::has_adaptation_field(&self.packet)
     }
 
+    /// Get the adaptation field length
     pub fn adaptation_field(&self) -> u8 {
         packet::adaptation_field(&self.packet)
     }
 
+    /// Set the scrambling mode
     pub fn set_scrambling(&mut self, scrambling: u8) {
         packet::set_scrambling(&mut self.packet, scrambling);
     }
 
+    /// Get the scrambling mode
     pub fn scrambling(&self) -> u8 {
         packet::scrambling(&self.packet)
     }
 
+    /// Set the discontinuity indicator
     pub fn set_discontinuity(&mut self) {
         packet::set_discontinuity(&mut self.packet);
     }
 
+    /// Clear the discontinuity indicator
     pub fn clear_discontinuity(&mut self) {
         packet::clear_discontinuity(&mut self.packet);
     }
 
+    /// Is the discontinuity indicator set?
     pub fn has_discontinuity(&self) -> bool {
         packet::has_discontinuity(&self.packet)
     }
 
+    /// Set the random access indicator
     pub fn set_random_access(&mut self) {
         packet::set_random_access(&mut self.packet);
     }
 
+    /// Is the random access indicator set?
     pub fn has_random_access(&self) -> bool {
         packet::has_random_access(&self.packet)
     }
 
+    /// Set the stream priority indicator
     pub fn set_stream_priority(&mut self) {
         packet::set_stream_priority(&mut self.packet);
     }
 
+    /// Is the stream priority indicator set?
     pub fn has_stream_priority(&self) -> bool {
         packet::has_stream_priority(&self.packet)
     }
 
+    /// Set the programme clock reference
     pub fn set_pcr(&mut self, pcr: u64) {
         packet::set_pcr(&mut self.packet, pcr);
     }
 
+    /// Does the packet have a programme clock reference field?
+    /// Only valid if it has an adaptation field.
     pub fn has_pcr(&self) -> bool {
         packet::has_pcr(&self.packet)
     }
 
+    /// Get the programme clock reference
     pub fn pcr(&self) -> u64 {
         packet::pcr(&self.packet)
     }
 
+    /// Set the programme clock reference extension
     pub fn set_pcr_ext(&mut self, ext: u16) {
         packet::set_pcr_ext(&mut self.packet, ext);
     }
 
+    /// Get the programme clock reference extension
     pub fn pcr_ext(&self) -> u16 {
         packet::pcr_ext(&self.packet)
     }

@@ -12,6 +12,7 @@ pub const SCRAMBLING_ODD: u8 = 3;
 
 pub type Packet = [u8; PACKET_SIZE];
 
+/// Get a new null packet
 pub fn null_packet() -> Packet {
     let mut packet: Packet = [0xff; PACKET_SIZE];
     packet[0] = SYNC_BYTE;
@@ -20,26 +21,32 @@ pub fn null_packet() -> Packet {
     return packet;
 }
 
+/// Set the transport error indicator
 pub fn set_transport_error(packet: &mut Packet) {
     packet[1] |= 0x80;
 }
 
+/// Is the transport error indicator set?
 pub fn has_transport_error(packet: &Packet) -> bool {
     packet[1] & 0x80 != 0
 }
 
+/// Set the unit start indicator
 pub fn set_unit_start(packet: &mut Packet) {
     packet[1] |= 0x40;
 }
 
+/// Is the unit start indicator set?
 pub fn has_unit_start(packet: &Packet) -> bool {
     packet[1] & 0x40 != 0
 }
 
+/// Set the transport priority indicator
 pub fn set_transport_priority(packet: &mut Packet) {
     packet[1] |= 0x20;
 }
 
+/// Is the transport priority indicator set?
 pub fn has_transport_priority(packet: &Packet) -> bool {
     packet[1] & 0x20 != 0
 }
@@ -49,7 +56,7 @@ pub fn set_payload(packet: &mut Packet) {
     packet[3] |= 0x10;
 }
 
-/// Does the packet have a payload indicator?
+/// Is the payload present indicator set?
 pub fn has_payload(packet: &Packet) -> bool {
     packet[3] & 0x10 != 0
 }
@@ -85,6 +92,7 @@ pub fn continuity_counter(packet: &Packet) -> u8 {
     packet[3] & 0x0f
 }
 
+/// Set the adaptation field length (&indicator)
 pub fn set_adaptation_field(packet: &mut Packet, length: u8) {
     packet[3] |= 0x20;
     packet[4] = length;
@@ -98,50 +106,62 @@ pub fn set_adaptation_field(packet: &mut Packet, length: u8) {
     }
 }
 
+/// Is the adaptation field indicator set?
 pub fn has_adaptation_field(packet: &Packet) -> bool {
     packet[3] & 0x20 != 0
 }
 
+/// Get the adaptation field length
 pub fn adaptation_field(packet: &Packet) -> u8 {
     packet[4]
 }
 
+/// Set the scrambling mode
 pub fn set_scrambling(packet: &mut Packet, scrambling: u8) {
     packet[3] = (scrambling | 0xc0) << 6;
 }
 
+/// Get the scrambling mode
 pub fn scrambling(packet: &Packet) -> u8 {
     (packet[3] & 0xc0) >> 6
 }
 
+/// Set the discontinuity indicator
 pub fn set_discontinuity(packet: &mut Packet) {
     packet[5] |= 0x80;
 }
 
+/// Clear the discontinuity indicator
 pub fn clear_discontinuity(packet: &mut Packet) {
     packet[5] &= !0x80;
 }
 
+/// Is the discontinuity indicator set?
 pub fn has_discontinuity(packet: &Packet) -> bool {
     packet[5] & 0x80 != 0
 }
 
+/// Set the random access indicator
 pub fn set_random_access(packet: &mut Packet) {
 	packet[5] |= 0x40;
 }
 
+/// Is the random access indicator set?
 pub fn has_random_access(packet: &Packet) -> bool {
 	packet[5] & 0x40 != 0
 }
 
+/// Set the stream priority indicator
 pub fn set_stream_priority(packet: &mut Packet) {
 	packet[5] |= 0x20;
 }
 
+/// Is the stream priority indicator set?
 pub fn has_stream_priority(packet: &Packet) -> bool {
 	packet[5] & 0x20 != 0
 }
 
+/// Set the programme clock reference
 pub fn set_pcr(packet: &mut Packet, pcr: u64) {
     packet[5] |= 0x10;
     packet[6] = (pcr >> 25) as u8 & 0xff;
@@ -157,15 +177,18 @@ pub fn has_pcr(packet: &Packet) -> bool {
     packet[5] & 0x10 != 0
 }
 
+/// Get the programme clock reference
 pub fn pcr(packet: &Packet) -> u64 {
     (packet[6] as u64) << 25 | (packet[7] as u64) << 17 | (packet[8] as u64) << 9 | (packet[9] as u64) << 1 | (packet[10] as u64) >> 7
 }
 
+/// Set the programme clock reference extension
 pub fn set_pcr_ext(packet: &mut Packet, ext: u16) {
     packet[10] |= (ext >> 8) as u8 & 0x1;
     packet[11] = ext as u8 & 0xff;
 }
 
+/// Get the programme clock reference extension
 pub fn pcr_ext(packet: &Packet) -> u16 {
     (((packet[10] as u16) << 8) & 1) | packet[11] as u16
 }
