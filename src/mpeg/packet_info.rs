@@ -37,10 +37,12 @@ impl PacketInfo {
         packet::has_transport_priority(&self.packet)
     }
 
+    /// Set the payload present indicator
     pub fn set_payload(&mut self) {
         packet::set_payload(&mut self.packet);
     }
 
+    /// Does the packet have a payload indicator?
     pub fn has_payload(&self) -> bool {
         packet::has_payload(&self.packet)
     }
@@ -50,6 +52,7 @@ impl PacketInfo {
         packet::set_pid(&mut self.packet, pid);
     }
 
+    /// Get the value of the pid
     pub fn pid(&self) -> u16 {
         packet::pid(&self.packet)
     }
@@ -59,6 +62,12 @@ impl PacketInfo {
         packet::set_continuity_counter(&mut self.packet, cc);
     }
 
+    /// Reset the continuity counter to zero
+    pub fn zero_continuity_counter(&mut self) {
+        packet::zero_continuity_counter(&mut self.packet);
+    }
+
+    /// Get the value of the continuity counter
     pub fn continuity_counter(&self) -> u8 {
         packet::continuity_counter(&self.packet)
     }
@@ -206,6 +215,15 @@ mod tests {
             p.set_continuity_counter(cc);
             assert_eq!(p.continuity_counter(), cc);
         }
+    }
+
+    #[test]
+    fn test_zero_continuity_counter() {
+        let mut packet = PacketInfo::null_packet();
+        packet.set_continuity_counter(5);
+        assert_eq!(packet.continuity_counter(), 5);
+        packet.zero_continuity_counter();
+        assert_eq!(packet.continuity_counter(), 0);
     }
 
     #[test]

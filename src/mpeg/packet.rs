@@ -43,20 +43,23 @@ pub fn has_transport_priority(packet: &Packet) -> bool {
     packet[1] & 0x20 != 0
 }
 
+/// Set the payload present indicator
 pub fn set_payload(packet: &mut Packet) {
     packet[3] |= 0x10;
 }
 
+/// Does the packet have a payload indicator?
 pub fn has_payload(packet: &Packet) -> bool {
     packet[3] & 0x10 != 0
 }
 
-/// Sets the PID. Max: 8191 (0x1fff)
+/// Set the PID. Max: 8191 (0x1fff)
 pub fn set_pid(packet: &mut Packet, pid: u16) {
     packet[1] = (pid >> 8) as u8 & 0x1f;
     packet[2] = (pid & 0x00ff) as u8;
 }
 
+/// Get the value of the pid
 pub fn pid(packet: &Packet) -> u16 {
     (((packet[1] & 0x1f) as u16) << 8) | packet[2] as u16
 }
@@ -66,6 +69,12 @@ pub fn set_continuity_counter(packet: &mut Packet, cc: u8) {
     packet[3] = cc & 0x0f;
 }
 
+/// Reset the continuity counter to zero
+pub fn zero_continuity_counter(packet: &mut Packet) {
+    packet[3] = packet[3] & 0xf0;
+}
+
+/// Get the value of the continuity counter
 pub fn continuity_counter(packet: &Packet) -> u8 {
     packet[3] & 0x0f
 }
@@ -216,6 +225,15 @@ mod tests {
             set_continuity_counter(&mut packet, cc);
             assert_eq!(continuity_counter(&packet), cc);
         }
+    }
+
+    #[test]
+    fn test_zero_continuity_counter() {
+        let mut packet = null_packet();
+        set_continuity_counter(&mut packet, 5);
+        assert_eq!(continuity_counter(&packet), 5);
+        zero_continuity_counter(&mut packet);
+        assert_eq!(continuity_counter(&packet), 0);
     }
 
     #[test]
