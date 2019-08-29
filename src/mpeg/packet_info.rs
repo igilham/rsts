@@ -151,3 +151,148 @@ impl Default for PacketInfo {
         PacketInfo::null_packet()
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_null_packet() {
+        let p: PacketInfo = PacketInfo::null_packet();
+        assert_eq!(p.pid(), packet::NULL_PACKET_PID);
+    }
+
+    #[test]
+    fn test_transport_error() {
+        let mut p = PacketInfo::null_packet();
+        p.set_transport_error();
+        assert!(p.has_transport_error());
+    }
+
+    #[test]
+    fn test_unit_start() {
+        let mut p = PacketInfo::null_packet();
+        p.set_unit_start();
+        assert!(p.has_unit_start());
+    }
+
+    #[test]
+    fn test_transport_priority() {
+        let mut p = PacketInfo::null_packet();
+        p.set_transport_priority();
+        assert!(p.has_transport_priority());
+    }
+
+    #[test]
+    fn test_payload() {
+        let mut p = PacketInfo::null_packet();
+        p.set_payload();
+        assert!(p.has_payload());
+    }
+
+    #[test]
+    fn test_pid() {
+        let mut p = PacketInfo::null_packet();
+        for pid in 0..8191 {
+            p.set_pid(pid);
+            assert_eq!(p.pid(), pid);
+        }
+    }
+
+    #[test]
+    fn test_continuity_counter() {
+        let mut p = PacketInfo::null_packet();
+        for cc in 0..15 {
+            p.set_continuity_counter(cc);
+            assert_eq!(p.continuity_counter(), cc);
+        }
+    }
+
+    #[test]
+    fn test_adaptation_field_0() {
+        let mut p = PacketInfo::null_packet();
+        let length: u8 = 0;
+        p.set_adaptation_field(length);
+        assert!(p.has_adaptation_field());
+        assert_eq!(p.adaptation_field(), length);
+    }
+
+    #[test]
+    fn test_adaptation_field_1() {
+        let mut p = PacketInfo::null_packet();
+        let length: u8 = 1;
+        p.set_adaptation_field(length);
+        assert!(p.has_adaptation_field());
+        assert_eq!(p.adaptation_field(), length);
+    }
+
+    #[test]
+    fn test_adaptation_field_2() {
+        let mut p = PacketInfo::null_packet();
+        let length: u8 = 2;
+        p.set_adaptation_field(length);
+        assert!(p.has_adaptation_field());
+        assert_eq!(p.adaptation_field(), length);
+    }
+
+    #[test]
+    fn test_scrambling_clear() {
+        let mut p = PacketInfo::null_packet();
+        p.set_scrambling(packet::SCRAMBLING_CLEAR);
+        assert_eq!(p.scrambling(), packet::SCRAMBLING_CLEAR);
+    }
+
+    #[test]
+    fn test_scrambling_even() {
+        let mut p = PacketInfo::null_packet();
+        p.set_scrambling(packet::SCRAMBLING_EVEN);
+        assert_eq!(p.scrambling(), packet::SCRAMBLING_EVEN);
+    }
+
+    #[test]
+    fn test_scrambling_odd() {
+        let mut p = PacketInfo::null_packet();
+        p.set_scrambling(packet::SCRAMBLING_ODD);
+        assert_eq!(p.scrambling(), packet::SCRAMBLING_ODD);
+    }
+
+    #[test]
+    fn test_discontinuity() {
+        let mut p = PacketInfo::null_packet();
+        p.set_discontinuity();
+        assert!(p.has_discontinuity());
+        p.clear_discontinuity();
+        assert!(!p.has_discontinuity());
+    }
+
+    #[test]
+    fn test_random_access() {
+        let mut p = PacketInfo::null_packet();
+        p.set_random_access();
+        assert!(p.has_random_access());
+    }
+
+    #[test]
+    fn test_stream_priority() {
+        let mut p = PacketInfo::null_packet();
+        p.set_stream_priority();
+        assert!(p.has_stream_priority());
+    }
+
+    #[test]
+    fn test_pcr() {
+        let mut p = PacketInfo::null_packet();
+        let pcr: u64 = 23647;
+        p.set_pcr(pcr);
+        assert!(p.has_pcr());
+        assert_eq!(p.pcr(), pcr);
+    }
+
+    #[test]
+    fn test_pcr_ext() {
+        let mut p = PacketInfo::null_packet();
+        let ext: u16 = 137;
+        p.set_pcr_ext(ext);
+        assert_eq!(p.pcr_ext(), ext);
+    }
+}
