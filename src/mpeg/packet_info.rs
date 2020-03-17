@@ -55,7 +55,7 @@ impl PacketInfo {
     }
 
     /// Get the payload as a slice of bytes
-    pub fn payload(&self) -> &[u8] {
+    pub fn payload(&self) -> Option<&[u8]> {
         packet::payload(&self.packet)
     }
 
@@ -200,9 +200,9 @@ mod tests {
         let p: PacketInfo = PacketInfo::null_packet();
         assert_eq!(p.pid(), packet::NULL_PACKET_PID);
         assert_eq!(p.continuity_counter(), 0);
-        let payload = p.payload();
         assert!(p.has_payload());
-        for i in 0..packet::PAYLOAD_SIZE {
+        let payload = p.payload().unwrap();
+        for i in 0..payload.len() {
             assert_eq!(payload[i], 0xff);
         }
         assert!(p.has_discontinuity());

@@ -69,8 +69,16 @@ pub fn has_payload(packet: &Packet) -> bool {
 }
 
 /// Get the payload as a slice of bytes
-pub fn payload(packet: &Packet) -> &[u8] {
-    &packet[4..PACKET_SIZE]
+pub fn payload(packet: &Packet) -> Option<&[u8]> {
+    if !has_payload(&packet) {
+        return None;
+    }
+    if !has_adaptation_field(&packet) {
+        return Some(&packet[HEADER_SIZE..PACKET_SIZE]);
+    }
+    let adaptation = adaptation_field(&packet) as usize;
+    let start_index: usize = HEADER_SIZE + 1 + adaptation;
+    return Some(&packet[start_index..PACKET_SIZE]);
 }
 
 /// Set the PID. Max: 8191 (0x1fff)
@@ -210,9 +218,9 @@ mod tests {
         assert_eq!(packet[0], SYNC_BYTE);
         assert_eq!(pid(&packet), NULL_PACKET_PID);
         assert_eq!(continuity_counter(&packet), 0);
-        let payload = payload(&packet);
         assert!(has_payload(&packet));
-        for i in 0..PAYLOAD_SIZE {
+        let payload = payload(&packet).unwrap();
+        for i in 0..payload.len() {
             assert_eq!(payload[i], 0xff);
         }
         assert!(has_discontinuity(&packet));
