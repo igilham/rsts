@@ -34,6 +34,11 @@ impl PacketInfo {
         packet::has_unit_start(&self.packet)
     }
 
+    /// Get the MPEG section, if present
+    pub fn section(&self) -> Option<&[u8]> {
+        packet::section(&self.packet)
+    }
+
     /// Set the transport priority indicator
     pub fn set_transport_priority(&mut self) {
         packet::set_transport_priority(&mut self.packet);

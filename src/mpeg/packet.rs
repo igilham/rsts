@@ -48,6 +48,18 @@ pub fn has_unit_start(packet: &Packet) -> bool {
     packet[1] & 0x40 != 0
 }
 
+/// Get the MPEG section, if present
+pub fn section(packet: &Packet) -> Option<&[u8]> {
+    let p = payload(&packet);
+    if has_unit_start(&packet) {
+        return p;
+    }
+    return match p {
+        Some(value) => Some(&value[1..value.len()]),
+        None => p,
+    }
+}
+
 /// Set the transport priority indicator
 pub fn set_transport_priority(packet: &mut Packet) {
     packet[1] |= 0x20;
