@@ -22,8 +22,9 @@ pub type Packet = [u8; PACKET_SIZE];
 pub fn null_packet() -> Packet {
     let mut packet: Packet = [0xff; PACKET_SIZE];
     packet[0] = SYNC_BYTE;
-    packet[1] = 0x1f; // first half of NULL_PACKET_PID, second half already set to 0xff
-    packet[3] = 0x10; // adaptation control and continuity
+    set_pid(&mut packet, 0x1fff);
+    set_continuity_counter(&mut packet, 0);
+    set_payload(&mut packet);
     return packet;
 }
 
