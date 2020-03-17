@@ -5,6 +5,10 @@ pub const SYNC_BYTE: u8 = 0x47;
 pub const MAX_PID: u16 = 0x1FFF;
 pub const NULL_PACKET_PID: u16 = MAX_PID;
 
+pub const PCR_MAX: usize = 2576980377600;	// 2^33 * 300
+pub const PCR_RATE: usize = 27000000;	// Hz
+pub const SECTION_MAX_SIZE: usize = 0x1000;
+
 // not technically defined in ISO-13818, but this seems to be the industry consensus
 pub const SCRAMBLING_CLEAR: u8 = 0;
 pub const SCRAMBLING_EVEN: u8 = 2;
