@@ -60,6 +60,9 @@ pub fn section(packet: &Packet) -> Option<&[u8]> {
     }
 }
 
+// ts_next_section not implemented from bitstream because it moves to
+// the next packet in the buffer
+
 /// Set the transport priority indicator
 pub fn set_transport_priority(packet: &mut Packet) {
     packet[1] |= 0x20;
