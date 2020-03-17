@@ -1,5 +1,7 @@
 pub const PACKET_SIZE: usize = 188;
 pub const HEADER_SIZE: usize = 4;
+pub const HEADER_SIZE_AF: usize = 6;
+pub const HEADER_SIZE_PCR: usize = 12;
 pub const PAYLOAD_SIZE: usize = PACKET_SIZE - HEADER_SIZE;
 pub const SYNC_BYTE: u8 = 0x47;
 pub const MAX_PID: u16 = 0x1FFF;
